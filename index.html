@@ -19,8 +19,8 @@
 </style>
 
 <div class="uploader-box">
-    <h3>Upload GIF → Supaimg URL</h3>
-    <input type="file" id="fileInput" accept="image/*" />
+    <h3>Upload Gambar / Video → Supaimg URL</h3>
+    <input type="file" id="fileInput" accept="image/*,video/*" />
 
     <button onclick="uploadToSupaimg()" style="
         margin-top:10px;
@@ -35,6 +35,40 @@
     <div id="result" class="url-output"></div>
 </div>
 
+<script>
+async function uploadToSupaimg() {
+    const file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Pilih file dulu!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    document.getElementById("result").innerHTML = "⏳ Uploading...";
+
+    try {
+        const res = await fetch("https://supaimg.com/api/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (data?.url) {
+            document.getElementById("result").innerHTML =
+                `✅ URL: <br><b>${data.url}</b>
+                <br><br><button onclick="navigator.clipboard.writeText('${data.url}')">Copy URL</button>`;
+        } else {
+            document.getElementById("result").innerHTML = "❌ Upload gagal! (Server menolak file)";
+        }
+    } catch (err) {
+        document.getElementById("result").innerHTML = "❌ Terjadi error saat upload!";
+    }
+}
+</script>
 <script>
 async function uploadToSupaimg() {
     const file = document.getElementById("fileInput").files[0];
